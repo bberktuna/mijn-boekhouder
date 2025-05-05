@@ -1,45 +1,89 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+// app/(tabs)/_layout.tsx
+import { Ionicons } from "@expo/vector-icons"
+import { Tabs } from "expo-router"
+import colors from "../../constants/colors"
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarActiveTintColor: colors.darkGreen,
+        tabBarInactiveTintColor: colors.darkGray,
+        tabBarStyle: {
+          backgroundColor: colors.lightGreen,
+          borderTopColor: colors.midGreen,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Dashboard",
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              color={color}
+              size={size}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="invoices/index"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Invoices",
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={focused ? "document-text" : "document-text-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="expenses/index"
+        options={{
+          title: "Expenses",
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={focused ? "cash" : "cash-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="km/index"
+        options={{
+          title: "KM",
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={focused ? "car" : "car-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="reports/index"
+        options={{
+          title: "Reports",
+          tabBarIcon: ({ color, focused, size }) => (
+            <Ionicons
+              name={focused ? "bar-chart" : "bar-chart-outline"}
+              color={color}
+              size={size}
+            />
+          ),
         }}
       />
     </Tabs>
-  );
+  )
 }
