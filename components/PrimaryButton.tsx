@@ -1,3 +1,4 @@
+import { AntDesign } from "@expo/vector-icons"
 import React from "react"
 import {
   StyleSheet,
@@ -13,6 +14,9 @@ interface PrimaryButtonProps {
   onPress: () => void
   style?: ViewStyle
   textStyle?: TextStyle
+  icon?: string
+  iconPosition?: "left" | "right"
+  iconColor?: string
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -20,6 +24,9 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   onPress,
   style,
   textStyle,
+  icon,
+  iconPosition = "left",
+  iconColor,
 }) => {
   return (
     <TouchableOpacity
@@ -27,18 +34,36 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       style={[styles.button, style]}
       activeOpacity={0.8}
     >
+      {icon && iconPosition === "left" && (
+        <AntDesign
+          name={icon}
+          size={20}
+          color={iconColor}
+          style={{ marginRight: 8 }}
+        />
+      )}
       <Text style={[styles.text, textStyle]}>{title}</Text>
+
+      {icon && iconPosition === "right" && (
+        <AntDesign
+          name={icon}
+          size={20}
+          color={iconColor}
+          style={{ marginLeft: 8 }}
+        />
+      )}
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   button: {
+    flexDirection: "row",
     backgroundColor: colors.midGreen,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 36,
     borderRadius: 24,
     alignItems: "center",
+    justifyContent: "center",
   },
   text: {
     color: colors.darkGreen,

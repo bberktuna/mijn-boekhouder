@@ -26,10 +26,12 @@ export default function RootLayout() {
   useEffect(() => {
     if (!isLoading) {
       if (isLoggedIn) {
-        router.replace("/(tabs)")
+        //! !!!!!!!!!!!!!!!!!!!!
+        router.replace("/(tabs)/results")
       } else {
+        //! !!!!!!!!!!!!!!!!!!!!
         //router.replace("/(auth)/signup")
-        router.replace("/(tabs)")
+        router.replace("/(tabs)/results")
       }
     }
   }, [isLoading])

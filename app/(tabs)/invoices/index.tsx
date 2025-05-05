@@ -1,59 +1,48 @@
-import { AntDesign, MaterialIcons } from "@expo/vector-icons"
-import React, { useState } from "react"
+import CollapsibleHeader from "@/components/CollapsibleHeader"
 import {
+  inkomstenTransactions,
+  uitgevenTransactions,
+} from "@/constants/transactionData"
+import { AntDesign, MaterialIcons } from "@expo/vector-icons"
+import React, { useRef, useState } from "react"
+import {
+  Animated,
   FlatList,
-  SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native"
-import { Appbar, Divider, FAB, IconButton, Searchbar } from "react-native-paper"
+import { Divider, FAB, IconButton, Searchbar } from "react-native-paper"
 import colors from "../../../constants/colors"
 
+const HEADER_HEIGHT = 100
+
 // Sample transaction data
-const transactions = [
-  {
-    id: "141",
-    description: "Fotoshoot",
-    amount: "€317,15",
-    date: "23-04-2025",
-  },
-  { id: "140", description: "Lunch", amount: "€24,50", date: "22-04-2025" },
-  {
-    id: "138",
-    description: "Verpakking",
-    amount: "€30,21",
-    date: "20-04-2025",
-  },
-  { id: "137", description: "Macbook", amount: "€1400,95", date: "18-04-2025" },
-  {
-    id: "136",
-    description: "Verzending",
-    amount: "€30,21",
-    date: "15-04-2025",
-  },
-  { id: "133", description: "Parkeren", amount: "€6,50", date: "12-04-2025" },
-  {
-    id: "132",
-    description: "Kantoorartikelen",
-    amount: "€10,50",
-    date: "10-04-2025",
-  },
-  { id: "129", description: "Software", amount: "€19,95", date: "08-04-2025" },
-]
 
 const invoices = () => {
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("expenses") // 'income' or 'expenses'
+  const [activeTab, setActiveTab] = useState("inkomsten") // 'income' or 'expenses'
   const [selectedYear, setSelectedYear] = useState("2025")
+  const scrollY = useRef(new Animated.Value(0)).current
 
-  const onChangeSearch = (query: any) => setSearchQuery(query)
+  const onChangeSearch = (query) => setSearchQuery(query)
 
-  const renderTransactionItem = ({ item }) => (
-    <View style={styles.transactionItem}>
+  const renderInkomstenTransactionItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.transactionItem,
+        {
+          backgroundColor:
+            item.id % 2 === 0
+              ? colors.white
+              : activeTab === "inkomsten"
+              ? colors.lightGreen
+              : colors.lightRed,
+        },
+      ]}
+    >
       <View style={styles.transactionLeft}>
         <Text style={styles.transactionId}>{item.id}</Text>
       </View>
@@ -62,48 +51,98 @@ const invoices = () => {
         <Text style={styles.transactionDate}>{item.date}</Text>
       </View>
       <View style={styles.transactionRight}>
-        <Text style={styles.transactionAmount}>{item.amount}</Text>
+        <Text
+          style={[
+            styles.transactionAmount,
+            {
+              color:
+                activeTab === "inkomsten" ? colors.midGreen : colors.midRed,
+            },
+          ]}
+        >
+          {"€"}
+          {item.amount}
+        </Text>
         <IconButton
-          icon="dots-vertical"
-          size={16}
+          icon="dots-horizontal"
+          size={20}
           iconColor={colors.darkGray}
           onPress={() => {}}
         />
       </View>
-    </View>
+    </TouchableOpacity>
+  )
+
+  const renderUitgevenTransactionItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.transactionItem,
+        {
+          backgroundColor:
+            item.id % 2 === 0
+              ? colors.white
+              : activeTab === "inkomsten"
+              ? colors.lightGreen
+              : colors.lightRed,
+        },
+      ]}
+    >
+      <View style={styles.transactionLeft}>
+        <Text style={styles.transactionId}>{item.id}</Text>
+      </View>
+      <View style={styles.transactionMiddle}>
+        <Text style={styles.transactionDesc}>{item.description}</Text>
+        <Text style={styles.transactionDate}>{item.date}</Text>
+      </View>
+      <View style={styles.transactionRight}>
+        <Text
+          style={[
+            styles.transactionAmount,
+            {
+              color:
+                activeTab === "inkomsten" ? colors.midGreen : colors.midRed,
+            },
+          ]}
+        >
+          {"€"}
+          {item.amount}
+        </Text>
+        <IconButton
+          icon="dots-horizontal"
+          size={20}
+          iconColor={colors.darkGray}
+          onPress={() => {}}
+        />
+      </View>
+    </TouchableOpacity>
   )
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={colors.lightGreen} barStyle="dark-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F3FEE8" />
 
       {/* Header */}
-      <Appbar.Header style={styles.header}>
-        <Text style={styles.logo}>Kasboek</Text>
-        <View style={styles.headerRight}>
-          <IconButton
-            icon="menu"
-            size={28}
-            iconColor={colors.darkGreen}
-            onPress={() => {}}
-          />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationText}>2</Text>
-          </View>
-        </View>
-      </Appbar.Header>
+      <CollapsibleHeader title="Invoices" scrollY={scrollY} />
 
-      <ScrollView style={styles.content}>
+      <Animated.ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingTop: HEADER_HEIGHT }}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+      >
         {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
-            style={[styles.tab, activeTab === "income" && styles.activeTab]}
-            onPress={() => setActiveTab("income")}
+            style={[styles.tab, activeTab === "inkomsten" && styles.activeTab]}
+            onPress={() => setActiveTab("inkomsten")}
           >
             <Text
               style={[
                 styles.tabText,
-                activeTab === "income" && styles.activeTabText,
+                activeTab === "inkomsten" && styles.activeTabText,
               ]}
             >
               Inkomsten
@@ -111,16 +150,16 @@ const invoices = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tab, activeTab === "expenses" && styles.activeTab]}
-            onPress={() => setActiveTab("expenses")}
+            style={[styles.tab, activeTab === "uitgeven" && styles.activeTab]}
+            onPress={() => setActiveTab("uitgeven")}
           >
             <Text
               style={[
                 styles.tabText,
-                activeTab === "expenses" && styles.activeTabText,
+                activeTab === "uitgeven" && styles.activeTabText,
               ]}
             >
-              Uitgaven
+              Uitgeven
             </Text>
           </TouchableOpacity>
         </View>
@@ -135,7 +174,11 @@ const invoices = () => {
               style={styles.searchIcon}
             />
             <Searchbar
-              placeholder="Uitgaven zoeken"
+              placeholder={
+                activeTab === "inkomsten"
+                  ? "Inkomsten zoeken"
+                  : "Uitgeven zoeken"
+              }
               onChangeText={onChangeSearch}
               value={searchQuery}
               style={styles.searchbar}
@@ -161,7 +204,7 @@ const invoices = () => {
             Omschrijving
           </Text>
           <Text style={[styles.columnHeaderText, styles.amountColumn]}>
-            Excl. BTW
+            Prijs{"    "}
           </Text>
           <Text style={[styles.columnHeaderText, styles.actionsColumn]}>
             Acties
@@ -169,14 +212,24 @@ const invoices = () => {
         </View>
 
         {/* Transactions List */}
-        <FlatList
-          data={transactions}
-          renderItem={renderTransactionItem}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <Divider style={styles.divider} />}
-        />
-      </ScrollView>
+        {activeTab === "inkomsten" ? (
+          <FlatList
+            data={inkomstenTransactions}
+            renderItem={renderInkomstenTransactionItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            ItemSeparatorComponent={() => <Divider style={styles.divider} />}
+          />
+        ) : (
+          <FlatList
+            data={uitgevenTransactions}
+            renderItem={renderUitgevenTransactionItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            ItemSeparatorComponent={() => <Divider style={styles.divider} />}
+          />
+        )}
+      </Animated.ScrollView>
 
       {/* FAB Button */}
       <FAB
@@ -185,20 +238,29 @@ const invoices = () => {
         color={colors.white}
         onPress={() => {}}
       />
-    </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.white,
+  },
+  headerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: colors.lightGreen,
+    zIndex: 10,
+    overflow: "hidden",
   },
   header: {
     backgroundColor: colors.lightGreen,
     elevation: 0,
     justifyContent: "space-between",
-    height: 32,
+    height: 48, // Yüksekliği 60'dan 48'e düşürdük
     paddingVertical: 0, // Ekstra padding'i kaldırdık
   },
   headerRight: {
@@ -206,25 +268,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     color: colors.darkGreen,
     marginLeft: 16,
   },
+  headerIcon: {
+    margin: 0,
+    padding: 0,
+  },
   notificationBadge: {
     position: "absolute",
-    right: 8,
-    top: 8,
+    right: 5,
+    top: 5,
     backgroundColor: colors.midGreen,
     borderRadius: 10,
-    width: 20,
-    height: 20,
+    width: 16,
+    height: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   notificationText: {
     color: colors.darkGreen,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "bold",
   },
   content: {
@@ -232,9 +298,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    marginTop: 10,
     paddingHorizontal: 16,
     paddingTop: 20,
+    paddingBottom: 80, // FAB butonunun altında boşluk bırak
   },
   title: {
     fontSize: 24,
@@ -279,6 +345,7 @@ const styles = StyleSheet.create({
     left: 10,
     top: 12,
     zIndex: 1,
+    color: colors.darkGreen,
   },
   searchbar: {
     elevation: 0,
@@ -287,8 +354,9 @@ const styles = StyleSheet.create({
     height: 45,
   },
   searchInput: {
-    paddingLeft: 30,
     fontSize: 14,
+    color: colors.darkGreen,
+    alignSelf: "center",
   },
   yearSelector: {
     flexDirection: "row",
@@ -313,35 +381,35 @@ const styles = StyleSheet.create({
   columnHeaderText: {
     fontSize: 13,
     color: colors.darkGray,
-    fontWeight: "500",
+    fontWeight: "bold",
   },
   idColumn: {
     width: "15%",
   },
   descColumn: {
-    width: "45%",
+    width: "40%",
   },
   amountColumn: {
-    width: "30%",
-    textAlign: "right",
+    width: "25%",
+    textAlign: "left",
   },
   actionsColumn: {
-    width: "10%",
+    width: "20%",
     textAlign: "center",
   },
   transactionItem: {
     flexDirection: "row",
-    paddingVertical: 16,
+    padding: 8,
     alignItems: "center",
   },
   transactionLeft: {
     width: "15%",
   },
   transactionMiddle: {
-    width: "45%",
+    width: "40%",
   },
   transactionRight: {
-    width: "40%",
+    width: "45%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -361,9 +429,18 @@ const styles = StyleSheet.create({
     color: colors.darkGray,
   },
   transactionAmount: {
-    fontWeight: "600",
-    color: colors.darkGreen,
     fontSize: 15,
+    width: "60%",
+    textAlign: "left",
+    fontWeight: "bold",
+  },
+  actionButtons: {
+    width: "40%",
+    alignItems: "center",
+  },
+  actionButton: {
+    margin: 0,
+    padding: 0,
   },
   divider: {
     backgroundColor: colors.lightGray,
@@ -374,6 +451,7 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 16,
     backgroundColor: colors.darkGreen,
+    borderRadius: 999,
   },
 })
 
