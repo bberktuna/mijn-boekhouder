@@ -43,7 +43,7 @@ const quarters: Quarter[] = [
     totalVAT: 1560,
     terugVAT: 800,
     totalKM: 1234,
-    lineData: [3000, 4500, 2800, 5000],
+    lineData: [3000, 4500, 2800, 5000, 7400, 8330],
     hoursWorked: 36,
   },
   {
